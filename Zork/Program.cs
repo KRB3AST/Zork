@@ -22,13 +22,6 @@ namespace Zork
             {
                 Console.WriteLine("Unrecognized command.");
             }
-            Commands command = ToCommand(inputString.Trim().ToUpper());
-            Console.WriteLine(command);
-        }
-
-        private static Commands ToCommand(string commandString)
-        {
-            return Enum.TryParse<Commands>(commandString, ignoreCase: true, out Commands command) ? command : Commands.UNKNOWN;
         }
     }
 }
