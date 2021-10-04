@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace Zork
 {
@@ -17,6 +18,7 @@ namespace Zork
             }
         }
     }
+
     internal class Program
     {
 
@@ -32,8 +34,8 @@ namespace Zork
         {
             Console.WriteLine("Welcome to Zork!");
 
-            const string roomDescriptionsFilename = "Rooms.txt";
-            InitializeRoomDescriptions(roomDescriptionsFilename);
+            const string roomDescriptionsFilename = "Rooms.json";
+            InitializeRooms(roomDescriptionsFilename);
 
 
             Room previousRoom = null;
@@ -115,30 +117,11 @@ namespace Zork
            
         private static bool IsDirection(Commands command) => Directions.Contains(command);
 
-        private static void InitializeRoomDescriptions(string roomsDescriptionsFilename)
-        {
-            var roomMap = new Dictionary<string, Room>();
-            foreach (Room room in Rooms)
-            {
-                roomMap.Add(room.Name, room);
-                roomMap[room.Name] = room;
-            }
+        private static void InitializeRooms(string roomsDescriptionsFilename) =>
+          Rooms = JsonConvert.DeserializeObject<Room[,]>(File.ReadAllText(roomsDescriptionsFilename));                        
+               
 
-            string[] lines = File.ReadAllLines(roomsDescriptionsFilename);
-            foreach (string line in lines)
-            {
-                const string delimiter = "##";
-                const int expectedFieldCount = 2;
-
-               string[] fields = line.Split(delimiter);
-               Assert.IsTrue(fields.Length == expectedFieldCount, "Invalid record.");
-
-                (string name, string description) = (fields[(int)Fields.Name], fields[(int)Fields.Description]);
-                roomMap[name].Description = description;
-            }                                       
-        }         
-
-        private static readonly Room[,] Rooms =
+        private static Room[,] Rooms =
         {
             { new Room("Rocky Trail"), new Room("South of House"), new Room("Canyon View") },
             { new Room("Forest"),      new Room("West of House"),   new Room("Behind House") },
